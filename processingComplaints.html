@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complaint Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #007BFF, #004A8F);
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            background-color: #f1f1f1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        .tabs {
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            display: block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .tab.active {
+            background-color: #004A8F;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .btn-view {
+            padding: 6px 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-archive {
+            padding: 6px 10px;
+            background-color: #FF0000;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Searchbar */
+        .search-container {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        .search-input {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .search-button {
+            padding: 6px 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 5px;
+        }
+
+        /* Profile */
+        .profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .profile-picture {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        .profile-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .profile-title {
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="profile">
+                <div class="profile-picture"></div>
+                <div class="profile-name">Juan Dela Cruz</div>
+                <div class="profile-title">Barangay Operator</div>
+            </div>
+            <div class="tabs">
+                <a href="brgyAdminProfile.html"><div class="tab">Profile</div></a>
+                <a href="pendingComplaints.html"><div class="tab">Pending Complaints</div></a>
+                <a href="processingComplaints.html"><div class="tab active">Processing Complaints</div></a>
+                <a href="completedComplaints.html"><div class="tab">Completed Complaints</div></a>
+            </div>
+        </div>
+        <div class="content">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search...">
+                <button class="search-button">Search</button>
+            </div>
+            <h1>Processing Complaints</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Complaint ID</th>
+                        <th>Complainant Name</th>
+                        <th>Complainant Cellphone No.</th>
+                        <th>Complaint Date and Time</th>
+                        <th>Complaint Address</th>
+                        <th>City</th>
+                        <th>Barangay</th>
+                        <th>Complaint Details</th>
+                        <th>Type of Complaint</th>
+                        <th>Priority</th>
+                        <th>Complaint Status</th>
+                        <!-- Hidden are Evidence, Remarks, Remarks Evidence-->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>June Clyde Elago</td>
+                        <td>09982378099</td>
+                        <td>03-10-2023 12:00:00</td>
+                        <td>#21 Jump Street</td>
+                        <td>Santa Rosa City</td>
+                        <td>Balibago</td>
+                        <td>May nagiinuman dito sa labas 3am na ang ingay nila</td>
+                        <td>Public Disturbance</td>
+                        <td>Normal</td>
+                        <td>Processing</td>
+                        <td>
+                            <button class="btn-view">View</button>
+                            <button class="btn-archive">Archive</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Josh Jan Francis Aguada</td>
+                        <td>09593314903</td>
+                        <td>04-20-2023 15:29:24</td>
+                        <td>1334 Burgos Subdivision</td>
+                        <td>Santa Rosa City</td>
+                        <td>Balibago</td>
+                        <td>May bumasag ng side mirror ng sasakyan namin</td>
+                        <td>Police Assistance</td>
+                        <td>Normal</td>
+                        <td>Processing</td>
+                        <td>
+                            <button class="btn-view">View</button>
+                            <button class="btn-archive">Archive</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
