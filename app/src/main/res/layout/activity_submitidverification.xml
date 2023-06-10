@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp"
+    android:background="@drawable/background_gradient">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <ImageButton
+            android:id="@+id/btnBurger"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+
+            android:background="@android:color/transparent"
+            android:contentDescription="Select ID Icon" />
+
+        <EditText
+            android:id="@+id/etSelectID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Select ID"
+            android:padding="16dp"
+            android:background="@android:color/white"
+            android:textColor="@android:color/black"
+            android:textColorHint="@android:color/darker_gray"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+
+        android:contentDescription="ID Placeholder"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/btnUploadID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Upload Photo of Valid ID"
+        android:layout_marginBottom="16dp" />
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+
+        android:contentDescription="Selfie Placeholder"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/btnUploadSelfie"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Upload Photo of Yourself holding the ID"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/btnContinue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Continue" />
+
+</LinearLayout>

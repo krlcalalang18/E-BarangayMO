@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/background_gradient">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Terms and Conditions"
+        android:textSize="24sp"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="24dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt viverra erat, quis pretium metus vestibulum eu. Nulla facilisi. Aliquam erat volutpat. Integer eget efficitur neque. Nullam posuere sollicitudin turpis sed elementum. Duis eleifend arcu eu ligula ultrices semper. In id nibh vel libero vehicula tempor sed id mi. Nam facilisis nulla lorem, sit amet tristique eros malesuada vitae. Sed non mi eu diam blandit malesuada. Quisque bibendum nunc mi, vel dictum lacus consectetur sit amet."
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:lineSpacingExtra="8dp"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in semper elit, eu consequat orci. Curabitur vitae lectus ac tortor posuere dapibus ac nec tellus. Aliquam dapibus efficitur aliquet. Nunc interdum arcu vel placerat iaculis. Curabitur a urna id nunc rutrum tempus a eu erat. Suspendisse lacinia tellus ut elit dictum scelerisque. Phasellus hendrerit dolor id cursus egestas."
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:lineSpacingExtra="8dp"
+                android:layout_marginBottom="16dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back"
+        android:textSize="18sp"
+        android:background="@android:color/transparent"
+        android:textColor="@android:color/white"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

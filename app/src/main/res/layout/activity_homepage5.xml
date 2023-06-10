@@ -1,0 +1,104 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_gradient">
+
+    <!-- Profile Image Placeholder -->
+
+    <!-- Name of User Text -->
+    <ImageView
+        android:id="@+id/ivProfileImage"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="Profile Image Placeholder"
+        android:src="@drawable/profile_placeholder"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.118"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Mobile Number Text -->
+    <TextView
+        android:id="@+id/tvUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="John Doe"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        tools:layout_editor_absoluteX="191dp"
+        tools:layout_editor_absoluteY="16dp" />
+
+    <!-- Verified Button -->
+
+    <TextView
+        android:id="@+id/tvMobileNumber"
+        android:layout_width="161dp"
+        android:layout_height="28dp"
+        android:text="Mobile Number: +1 123 456 7890"
+        android:textColor="@android:color/white"
+        android:textSize="10sp"
+        tools:layout_editor_absoluteX="191dp"
+        tools:layout_editor_absoluteY="48dp" />
+
+    <!-- Crime Prevention Tips Button -->
+    <Button
+        android:id="@+id/btnVerified"
+        android:layout_width="121dp"
+        android:layout_height="37dp"
+        android:text="Verified"
+        android:textSize="12dpsp"
+        tools:layout_editor_absoluteX="191dp"
+        tools:layout_editor_absoluteY="83dp" />
+
+    <!-- Resubmit ID Button -->
+    <Button
+        android:id="@+id/btnCrimePreventionTips"
+        android:layout_width="193dp"
+        android:layout_height="46dp"
+        android:text="Crime Prevention Tips"
+        android:textSize="12sp"
+        tools:layout_editor_absoluteX="191dp"
+        tools:layout_editor_absoluteY="127dp" />
+
+    <!-- Edit Profile Button -->
+    <Button
+        android:id="@+id/btnResubmitID"
+        android:layout_width="203dp"
+        android:layout_height="124dp"
+        android:text="Resubmit ID"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.524"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="238dp" />
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="259dp"
+        android:layout_height="58dp"
+        android:layout_marginTop="20dp"
+        android:text="Logout"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.532"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnEditProfile" />
+
+    <Button
+        android:id="@+id/btnEditProfile"
+        android:layout_width="207dp"
+        android:layout_height="76dp"
+        android:layout_marginTop="12dp"
+        android:text="Edit Profile"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.524"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnResubmitID" />
+
+    <!-- Logout Button -->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

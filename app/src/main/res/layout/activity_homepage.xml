@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_gradient">
+
+    <TableLayout
+        android:id="@+id/tableMyComplaints"
+        android:layout_width="416dp"
+        android:layout_height="218dp"
+        android:stretchColumns="*"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="473dp">
+
+        <!-- Table Row - Header -->
+        <TableRow
+            android:id="@+id/tableRowHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvComplaintIDColumn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="ID"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvComplaintDetailsColumn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Details"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDateTimeColumn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Date and Time"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvStatusColumn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Status"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+
+        </TableRow>
+
+        <!-- Table Rows - Data -->
+        <TableRow
+            android:id="@+id/tableRowData1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvComplaintIDData1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="C001"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tvComplaintDetailsData1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Lorem ipsum dolor sit amet"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tvDateTimeData1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="2023-05-29 10:30 AM"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tvStatusData1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Pending"
+                android:textColor="@android:color/white" />
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRowData2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvComplaintIDData2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="C002"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tvComplaintDetailsData2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Lorem ipsum dolor sit amet"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tvDateTimeData2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="2023-05-30 09:45 AM"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tvStatusData2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Resolved"
+                android:textColor="@android:color/white" />
+
+        </TableRow>
+
+        <!-- Add more TableRow elements for additional data rows -->
+
+    </TableLayout>
+
+    <ImageButton
+        android:id="@+id/btnBellNotification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_bell_notification"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imgProfilePlaceholder"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/placeholder_profile_image"
+        tools:layout_editor_absoluteX="19dp"
+        tools:layout_editor_absoluteY="16dp" />
+
+    <TextView
+        android:id="@+id/tvUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name of User"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        tools:layout_editor_absoluteX="149dp"
+        tools:layout_editor_absoluteY="16dp" />
+
+    <TextView
+        android:id="@+id/tvMobileNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mobile Number"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        tools:layout_editor_absoluteX="154dp"
+        tools:layout_editor_absoluteY="47dp" />
+
+    <Button
+        android:id="@+id/btnVerified"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Verified"
+        android:textSize="14sp"
+        tools:layout_editor_absoluteX="161dp"
+        tools:layout_editor_absoluteY="66dp" />
+
+    <Button
+        android:id="@+id/btnMyProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="My Profile"
+        android:textSize="16sp"
+        tools:layout_editor_absoluteX="19dp"
+        tools:layout_editor_absoluteY="136dp" />
+
+    <Button
+        android:id="@+id/btnCrimePreventionTips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Crime Prevention Tips"
+        android:textSize="16sp"
+        tools:layout_editor_absoluteX="184dp"
+        tools:layout_editor_absoluteY="136dp" />
+
+    <!-- My Complaints Table -->
+
+    <Button
+        android:id="@+id/btnFileComplaint"
+        android:layout_width="383dp"
+        android:layout_height="169dp"
+        android:text="File a Complaint"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/tableMyComplaints"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.428"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.648" />
+
+    <Button
+        android:id="@+id/btnBackToLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back to Login"
+        android:textSize="16sp"
+        tools:layout_editor_absoluteX="133dp"
+        tools:layout_editor_absoluteY="782dp" />
+
+    <LinearLayout
+        android:id="@+id/layoutPagination"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteX="138dp"
+        tools:layout_editor_absoluteY="709dp">
+
+        <Button
+            android:id="@+id/btnPreviousPage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Previous"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnNextPage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <!-- Pagination Buttons -->
+
+</androidx.constraintlayout.widget.ConstraintLayout>
