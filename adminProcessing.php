@@ -49,6 +49,10 @@
             background-color: #004A8F;
         }
 
+        .tab.logout {
+            background-color: #FF0000;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -162,10 +166,11 @@
                 <div class="profile-title">Barangay Operator</div>
             </div>
             <div class="tabs">
-                <a href="brgyAdminProfile.html"><div class="tab">Profile</div></a>
+                <a href="barangay_operator_profile.php"><div class="tab">Profile</div></a>
                 <a href="admin.php"><div class="tab">Pending Complaints</div></a>
                 <a href="adminProcessing.php"><div class="tab active">Processing Complaints</div></a>
                 <a href="adminComplete.php"><div class="tab">Completed Complaints</div></a>
+                <a href="index.php"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
             </div>
 
         </div>
@@ -192,36 +197,74 @@
             <tbody>
 
             <?php
-                // UPDATE DETAILS (NO MEDIA YET)
-                if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+
+
+                //DIFFERENT APPROACH FOR WITH UPLOADING FILES
+                $servername = "localhost";
+                $username = "root";
+                $password = "";
+                $database = "ebarangaydatabase";
+                $conn = mysqli_connect($servername, $username, $password, $database);
+
+                if (!$conn) {
+                    die("Connection failed: " . mysqli_connect_error());
+                }
+
+                if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["complaintID"])) {
                     $complaintID = $_POST["complaintID"];
-                    $status = $_POST["status"];
+                    $complaintStatus = $_POST["complaintStatus"];
                     $remarks = $_POST["remarks"];
-                    $priority = $_POST["priority"];
+                    $priorityLevel = $_POST["priorityLevel"];
 
-                    $conn = new mysqli("localhost", "root", "", "ebarangaydatabase");
-                    if ($conn->connect_error) {
-                    die("Connection failed: " . $conn->connect_error);
-                    }
+                if (isset($_FILES["remarksEvidence"]) && $_FILES["remarksEvidence"]["error"] === UPLOAD_ERR_OK) {
+                        $file = $_FILES["remarksEvidence"];
+                        $fileName = $file["name"];
+                        $fileTmpPath = $file["tmp_name"];
+                        $fileSize = $file["size"];
 
-                    $sql = "UPDATE complaint SET complaintStatus = '$status', remarks = '$remarks', priorityLevel = '$priority' WHERE complaintID = $complaintID";
-                    if ($conn->query($sql) === TRUE) {
-                        echo "Complaint updated successfully";
+                        $fileContent = file_get_contents($fileTmpPath);
+
+                        $sql = "UPDATE complaint SET complaintStatus = ?, remarks = ?, priorityLevel = ?, remarksEvidence = ? WHERE complaintID = ?";
+                        $stmt = mysqli_prepare($conn, $sql);
+                        mysqli_stmt_bind_param($stmt, "sssbi", $complaintStatus, $remarks, $priorityLevel, $fileContent, $complaintID);
+                        mysqli_stmt_send_long_data($stmt, 3, $fileContent);
+                        mysqli_stmt_execute($stmt);
+
+                        if (mysqli_stmt_affected_rows($stmt) > 0) {
+                            echo "Complaint updated successfully!";
+                        } else {
+                            echo "Error updating complaint.";
+                        }
+
+                        mysqli_stmt_close($stmt);
+
                     } else {
-                        echo "Error updating complaint: " . $conn->error;
-                    }
+                        $sql = "UPDATE complaint SET complaintStatus = ?, remarks = ?, priorityLevel = ? WHERE complaintID = ?";
+                        $stmt = mysqli_prepare($conn, $sql);
+                        mysqli_stmt_bind_param($stmt, "sssi", $complaintStatus, $remarks, $priorityLevel, $complaintID);
+                        mysqli_stmt_execute($stmt);
 
-                $conn->close();
-}
-?>
+                        if (mysqli_stmt_affected_rows($stmt) > 0) {
+                            echo "Complaint updated successfully.";
+                        } else {
+                            echo "Error updating complaint.";
+                        }
 
+                        mysqli_stmt_close($stmt);
+        }
+    }
 
+    mysqli_close($conn);
+    ?>
 
                 <?php
                 $conn = new mysqli("localhost", "root", "", "ebarangaydatabase");
                 if ($conn->connect_error) {
                     die("Connection failed: " . $conn->connect_error);
                 }
+
+                
 
                 $sql = "SELECT DISTINCT c.complaintID, CONCAT(u.firstName, ' ', u.lastName) AS ComplainantName, u.cellphoneNumber AS ComplainantCellphoneNo, c.complaintDateAndTime, c.complaintAddress, ct.cityName AS City, bs.barangayName AS Barangay, c.complaintDetails, c.complaintType, c.priorityLevel, c.complaintStatus, c.complaintEvidence, c.remarks, c.remarksEvidence
                         FROM complaint c
@@ -230,6 +273,7 @@
                         INNER JOIN city ct ON c.barangayID = bs.cityID
                         WHERE complaintStatus = 'Processing'";
                 $result = $conn->query($sql);
+
 
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
@@ -247,6 +291,7 @@
                         $complaintEvidence = base64_encode($row["complaintEvidence"]);
                         $remarks = $row["remarks"];
                         $remarksEvidence = base64_encode($row["remarksEvidence"]);
+                        
 
                         echo "<tr>
                                 <td>$complaintID</td>
@@ -336,12 +381,12 @@
                                         <input type='text' class='form-control' rows='3' value='$complaintType' readonly>
                                         </div>             
 
-                                            <form method='POST' action=''>
+                                            <form method='POST' action='' enctype='multipart/form-data'>
                                                 <input type='hidden' name='complaintID' value='$complaintID'>
 
                                                 <div class='form-group'>
                                                     <label for='status'>Status</label>
-                                                    <select class='form-control' name='status'>
+                                                    <select class='form-control' name='complaintStatus'>
                                                         <option value='Pending' " . ($complaintStatus == 'Pending' ? 'selected' : '') . ">Pending</option>
                                                         <option value='Processing' " . ($complaintStatus == 'Processing' ? 'selected' : '') . ">Processing</option>
                                                         <option value='Complete' " . ($complaintStatus == 'Complete' ? 'selected' : '') . ">Complete</option>
@@ -350,7 +395,7 @@
 
                                                 <div class='form-group'> 
                                                     <label for='priorityLevel'>Priority</label>
-                                                    <select class='form-control' name='priority'>
+                                                    <select class='form-control' name='priorityLevel'>
                                                         <option value='Normal' " . ($priorityLevel == 'Normal' ? 'selected' : '') . ">Normal</option>
                                                         <option value='High' " . ($priorityLevel == 'High' ? 'selected' : '') . ">High</option>
                                                     </select>
@@ -363,7 +408,7 @@
 
                                                 <div class='form-group'>
                                                     <label for='remarksEvidence'>Remarks Evidence</label>
-                                                    <input type='file' class='form-control' name='remarksEvidence'>
+                                                    <input type='file' class='form-control' name='remarksEvidence' id='remarksEvidence'>
                                                 </div>
                                                 <button type='submit' class='btn btn-primary'>Update</button>
                                             </form>

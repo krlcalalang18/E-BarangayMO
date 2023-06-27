@@ -48,6 +48,11 @@
             background-color: #004A8F;
         }
 
+        .tab.logout {
+            background-color: #FF0000;
+        }
+
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -149,10 +154,11 @@
                 <div class="profile-title">Administrator</div>
             </div>
             <div class="tabs">
-                <a href=""><div class="tab">Profile</div></a>
-                <a href="display_city.php"><div class="tab">Cities</div></a>
+            <a href="admin_profile.php"><div class="tab">Profile</div></a>
+                <a href="display_city.php"><div class="tab active">Cities</div></a>
                 <a href="display_barangay.php"><div class="tab">Barangays</div></a>
                 <a href="display_operator.php"><div class="tab">Operator Management</div></a>
+                <a href="index.php"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
             </div>
         </div>
         <div class="content">

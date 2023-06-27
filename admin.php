@@ -49,6 +49,10 @@
             background-color: #004A8F;
         }
 
+        .tab.logout {
+            background-color: #FF0000;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -162,10 +166,11 @@
                 <div class="profile-title">Barangay Operator</div>
             </div>
             <div class="tabs">
-                <a href="brgyAdminProfile.html"><div class="tab">Profile</div></a>
+                <a href="barangay_operator_profile.php"><div class="tab">Profile</div></a>
                 <a href="admin.php"><div class="tab active">Pending Complaints</div></a>
                 <a href="adminProcessing.php"><div class="tab">Processing Complaints</div></a>
                 <a href="adminComplete.php"><div class="tab">Completed Complaints</div></a>
+                <a href="index.php"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
             </div>
 
         </div>
@@ -192,7 +197,6 @@
             <tbody>
 
             <?php
-                // UPDATE DETAILS (NO MEDIA YET)
                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $complaintID = $_POST["complaintID"];
                     $status = $_POST["status"];
@@ -204,11 +208,13 @@
                     die("Connection failed: " . $conn->connect_error);
                     }
 
-                    $sql = "UPDATE complaint SET complaintStatus = '$status', remarks = '$remarks', priorityLevel = '$priority' WHERE complaintID = $complaintID";
+                    $sql = "UPDATE complaint 
+                            SET complaintStatus = '$status', remarks = '$remarks', priorityLevel = '$priority'
+                            WHERE complaintID = $complaintID";
                     if ($conn->query($sql) === TRUE) {
-                        echo "Complaint updated successfully";
+                        echo "Complaint updated successfully!";
                     } else {
-                        echo "Error updating complaint: " . $conn->error;
+                        echo "Error updating complaint.";
                     }
 
                 $conn->close();
@@ -361,10 +367,6 @@
                                                     <input type='text' class='form-control' name='remarks' value='$remarks'>
                                                 </div>
 
-                                                <div class='form-group'>
-                                                    <label for='remarksEvidence'>Remarks Evidence</label>
-                                                    <input type='file' class='form-control' name='remarksEvidence'>
-                                                </div>
                                                 <button type='submit' class='btn btn-primary'>Update</button>
                                             </form>
                                         </div>
