@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Barangay Operator - Pending Complaints</title>
+    <title>LGU Operator - Citizen Verification</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
 
@@ -47,6 +47,10 @@
 
         .tab.active {
             background-color: #004A8F;
+        }
+
+        .tab.logout {
+            background-color: #FF0000;
         }
 
         table {
@@ -158,19 +162,20 @@
         <div class="sidebar">
             <div class="profile">
                 <div class="profile-picture"></div>
-                <div class="profile-name">Juan Dela Cruz</div>
-                <div class="profile-title">Barangay Operator</div>
+                <div class="profile-name">Joseph Monroe Santos</div>
+                <div class="profile-title">LGU Operator</div>
             </div>
             <div class="tabs">
-                <a href="brgyAdminProfile.html"><div class="tab">Profile</div></a>
-                <a href="admin.php"><div class="tab active">Pending Complaints</div></a>
-                <a href="adminProcessing.php"><div class="tab">Processing Complaints</div></a>
-                <a href="adminComplete.php"><div class="tab">Completed Complaints</div></a>
+                <a href=""><div class="tab">Profile</div></a>
+                <a href=""><div class="tab">Dashboard</div></a>
+                <a href="display_citizen.php"><div class="tab active">Citizen Verification</div></a>
+                <a href=".php"><div class="tab">Audit Logs</div></a>
+                <a href="index.php"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
             </div>
 
         </div>
         <div class="content">
-        <h2>Complaint Records</h2>
+        <h2>Citizen Verification</h2>
         <table class="table">
             <thead>
                 <tr>
@@ -185,8 +190,6 @@
                     <th>ID Type</th>
                     <th>ID Expiry</th>
                     <th>ID Birthday</th>
-                    <th>ID Picture</th>
-                    <th>ID Self Photo</th>
                     <th>Account Status</th>
                     <th>Action</th>
                 </tr>
@@ -196,17 +199,17 @@
             <?php
                 // UPDATE DETAILS (NO MEDIA YET)
                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                    $complaintID = $_POST["complaintID"];
+                    $userID = $_POST["userID"];
                     $status = $_POST["status"];
-                    $remarks = $_POST["remarks"];
-                    $priority = $_POST["priority"];
 
                     $conn = new mysqli("localhost", "root", "", "ebarangaydatabase");
                     if ($conn->connect_error) {
                     die("Connection failed: " . $conn->connect_error);
                     }
 
-                    $sql = "UPDATE complaint SET complaintStatus = '$status', remarks = '$remarks', priorityLevel = '$priority' WHERE complaintID = $complaintID";
+                    $sql = "UPDATE user 
+                            SET accountStatus = '$status'
+                            WHERE userID = $userID";
                     if ($conn->query($sql) === TRUE) {
                         echo "Complaint updated successfully";
                     } else {
@@ -225,7 +228,7 @@
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                $sql = "SELECT c.citizenID, c.idNumber, c.idType, c.idExpiry, c.idBirthday, c.idPicture, c.idSelfPhoto,
+                $sql = "SELECT c.citizenID, c.idNumber, c.idType, c.idExpiry, c.idBirthday, c.idPicture, c.idSelfPhoto, u.userID,
                                u.firstName, u.lastName, u.middleName, u.emailAddress, u.streetAddress, u.city, u.barangay, u.accountStatus
                         FROM   citizen c
                         INNER JOIN user u ON c.userID = u.userID";
@@ -233,6 +236,9 @@
 
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
+
+                        $userID = $row["userID"];
+                        $citizenID = $row["citizenID"];
                         $firstName = $row["firstName"];
                         $lastName = $row["lastName"];
                         $middleName = $row["middleName"];
@@ -261,11 +267,9 @@
                                 <td>$idType</td>
                                 <td>$idExpiry</td>
                                 <td>$idBirthday</td>
-                                <td>$idPicture</td>
-                                <td>$idSelfPhoto</td>
                                 <td>$accountStatus</td>
                                 <td>
-                                    <button type='button' class='btn btn-primary' data-toggle='modal' data-target='#myModal$complaintID'>
+                                    <button type='button' class='btn btn-primary' data-toggle='modal' data-target='#myModal$citizenID'>
                                         View
                                     </button>
                                 </td>
@@ -277,7 +281,7 @@
                             </tr>";
 
                         //POP UP
-                        echo "<div class='modal fade' id='myModal$complaintID' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
+                        echo "<div class='modal fade' id='myModal$citizenID' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
                                 <div class='modal-dialog' role='document'>
                                     <div class='modal-content'>
                                         <div class='modal-header'>
@@ -289,10 +293,29 @@
                                         <div class='modal-body'>
 
                                         <div class='form-group'>
-                                        <label for='remarks'>Complaint ID</label>
-                                        <input type='text' class='form-control' value='$complaintID' readonly>
+                                        <label for='remarks'>Citizen ID</label>
+                                        <input type='text' class='form-control' value='$citizenID' readonly>
                                         </div>
 
+                                        <div class='form-group'>
+                                        <label for='remarks'>First Name</label>
+                                        <input type='text' class='form-control' value='$firstName' readonly>
+                                        </div>
+
+                                        <div class='form-group'>
+                                        <label for='remarks'>Last Name</label>
+                                        <input type='text' class='form-control' value='$lastName' readonly>
+                                        </div>
+
+                                        <div class='form-group'>
+                                        <label for='remarks'>Email Address</label>
+                                        <input type='text' class='form-control' value='$emailAddress' readonly>
+                                        </div>
+
+                                        <div class='form-group'>
+                                        <label for='remarks'>Street Address</label>
+                                        <input type='text' class='form-control' value='$streetAddress' readonly>
+                                        </div>
 
                                         <div class='form-group'>
                                         <label for='remarks'>City</label>
@@ -303,36 +326,46 @@
                                         <label for='remarks'>Barangay</label>
                                         <input type='text' class='form-control' value='$barangay' readonly>
                                         </div>
-         
+
+                                        <div class='form-group'>
+                                        <label for='remarks'>Valid ID Number</label>
+                                        <input type='text' class='form-control' value='$idNumber' readonly>
+                                        </div>
+
+                                        <div class='form-group'>
+                                        <label for='remarks'>Valid ID Type</label>
+                                        <input type='text' class='form-control' value='$idType' readonly>
+                                        </div>
+
+                                        <div class='form-group'>
+                                        <label for='remarks'>Valid ID Expiry</label>
+                                        <input type='text' class='form-control' value='$idExpiry' readonly>
+                                        </div>
+
+                                        <div class='form-group'>
+                                        <label for='remarks'>Valid ID Birthday</label>
+                                        <input type='text' class='form-control' value='$idBirthday' readonly>
+                                        </div>
+
+                                        <div class='form-group'>
+                                        <label for='remarks'>Valid ID Picture:</label>
+                                        <img src='data:image/jpeg;base64,$idPicture' style='width: 160px; height: 120px;'>
+                                        </div>
+
+                                        <div class='form-group'>
+                                        <label for='remarks'>ID Self Photo:</label>
+                                        <img src='data:image/jpeg;base64,$idSelfPhoto' style='width: 160px; height: 120px;'>
+                                        </div>
 
                                             <form method='POST' action=''>
-                                                <input type='hidden' name='complaintID' value='$complaintID'>
+                                                <input type='hidden' name='userID' value='$userID'>
 
                                                 <div class='form-group'>
                                                     <label for='status'>Status</label>
                                                     <select class='form-control' name='status'>
-                                                        <option value='Pending' " . ($complaintStatus == 'Pending' ? 'selected' : '') . ">Pending</option>
-                                                        <option value='Processing' " . ($complaintStatus == 'Processing' ? 'selected' : '') . ">Processing</option>
-                                                        <option value='Complete' " . ($complaintStatus == 'Complete' ? 'selected' : '') . ">Complete</option>
+                                                        <option value='Pending' " . ($accountStatus == 'Pending' ? 'selected' : '') . ">Pending</option>
+                                                        <option value='Active' " . ($accountStatus == 'Active' ? 'selected' : '') . ">Active</option>
                                                     </select>
-                                                </div>
-
-                                                <div class='form-group'> 
-                                                    <label for='priorityLevel'>Priority</label>
-                                                    <select class='form-control' name='priority'>
-                                                        <option value='Normal' " . ($priorityLevel == 'Normal' ? 'selected' : '') . ">Normal</option>
-                                                        <option value='High' " . ($priorityLevel == 'High' ? 'selected' : '') . ">High</option>
-                                                    </select>
-                                                </div>
-
-                                                <div class='form-group'>
-                                                    <label for='remarks'>Remarks</label>
-                                                    <input type='text' class='form-control' name='remarks' value='$remarks'>
-                                                </div>
-
-                                                <div class='form-group'>
-                                                    <label for='remarksEvidence'>Remarks Evidence</label>
-                                                    <input type='file' class='form-control' name='remarksEvidence'>
                                                 </div>
                                                 <button type='submit' class='btn btn-primary'>Update</button>
                                             </form>

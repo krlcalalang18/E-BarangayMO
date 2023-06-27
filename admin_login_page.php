@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Operator Login</title>
+    <title>Administrator Login</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>Barangay Operator Login</h1>
+        <h1>Administrator Login</h1>
 
-        <form method="POST" action="brgy_login.php">
+        <form method="POST" action="admin_login.php">
             <div class="form-group">
                 <label for="cellphoneNumber">Cellphone Number</label>
                 <input type="text" class="form-control" id="cellphoneNumber" name="cellphoneNumber" required>
@@ -22,9 +22,11 @@
             <button type="submit" class="btn btn-primary">Login</button>
 
         </form>
+        <br>
         
+        <a href="create_admin.php"> Register Here </a>
         <br/>
-        <a href="admin_login_page.php"> Administrator Login </a>
+        <a href="index.php"> Barangay Operator Login </a>
         <br/>
         <a href="lgu_operator_login_page.php"> LGU Operator Login </a>
     </div>

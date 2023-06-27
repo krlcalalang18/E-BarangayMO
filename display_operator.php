@@ -69,6 +69,11 @@ $result2 = $conn->query($sql2);
             background-color: #004A8F;
         }
 
+        .tab.logout {
+            background-color: #FF0000;
+        }
+
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -174,6 +179,7 @@ $result2 = $conn->query($sql2);
                 <a href="display_city.php"><div class="tab">Cities</div></a>
                 <a href="display_barangay.php"><div class="tab">Barangays</div></a>
                 <a href="display_operator.php"><div class="tab">Operator Management</div></a>
+                <a href="index.php"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
             </div>
         </div>
         <div class="content">
