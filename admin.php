@@ -1,3 +1,13 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['sessionBrgyOperatorID'])){
+
+    header("Location: session_error_page.php");
+}
+
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -47,6 +57,10 @@
 
         .tab.active {
             background-color: #004A8F;
+        }
+
+        .tab.logout {
+            background-color: #FF0000;
         }
 
         table {
@@ -158,14 +172,40 @@
         <div class="sidebar">
             <div class="profile">
                 <div class="profile-picture"></div>
-                <div class="profile-name">Juan Dela Cruz</div>
+                <div class="profile-name">
+
+                <?php 
+                //GET SESSION DETAILS CONVERT TO NAME 
+                $testSession = $_SESSION['sessionBrgyOperatorID'];
+                $conn = new mysqli('localhost', 'root', '', 'ebarangaydatabase');
+
+                if ($conn->connect_error) {
+                    die("Connection failed: " . $conn->connect_error);
+                }
+
+                $sql = "SELECT firstName, lastName FROM user WHERE userID = '$testSession' AND accountType = 'Barangay Operator'";
+                $result = $conn->query($sql);
+
+                if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $SfirstName = $row['firstName'];
+                $SlastName = $row['lastName'];
+
+                echo "$SfirstName $SlastName";
+                } else {
+                }   
+                $conn->close();
+                ?>
+
+                </div>
                 <div class="profile-title">Barangay Operator</div>
             </div>
             <div class="tabs">
-                <a href="brgyAdminProfile.html"><div class="tab">Profile</div></a>
+                <a href="barangay_operator_profile.php"><div class="tab">Profile</div></a>
                 <a href="admin.php"><div class="tab active">Pending Complaints</div></a>
                 <a href="adminProcessing.php"><div class="tab">Processing Complaints</div></a>
                 <a href="adminComplete.php"><div class="tab">Completed Complaints</div></a>
+                <a href="logout.php"><div class="tab logout">Log Out</div></a>
             </div>
 
         </div>
@@ -192,7 +232,6 @@
             <tbody>
 
             <?php
-                // UPDATE DETAILS (NO MEDIA YET)
                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $complaintID = $_POST["complaintID"];
                     $status = $_POST["status"];
@@ -204,11 +243,13 @@
                     die("Connection failed: " . $conn->connect_error);
                     }
 
-                    $sql = "UPDATE complaint SET complaintStatus = '$status', remarks = '$remarks', priorityLevel = '$priority' WHERE complaintID = $complaintID";
+                    $sql = "UPDATE complaint 
+                            SET complaintStatus = '$status', remarks = '$remarks', priorityLevel = '$priority'
+                            WHERE complaintID = $complaintID";
                     if ($conn->query($sql) === TRUE) {
-                        echo "Complaint updated successfully";
+                        echo "Complaint updated successfully!";
                     } else {
-                        echo "Error updating complaint: " . $conn->error;
+                        echo "Error updating complaint.";
                     }
 
                 $conn->close();
@@ -361,10 +402,6 @@
                                                     <input type='text' class='form-control' name='remarks' value='$remarks'>
                                                 </div>
 
-                                                <div class='form-group'>
-                                                    <label for='remarksEvidence'>Remarks Evidence</label>
-                                                    <input type='file' class='form-control' name='remarksEvidence'>
-                                                </div>
                                                 <button type='submit' class='btn btn-primary'>Update</button>
                                             </form>
                                         </div>

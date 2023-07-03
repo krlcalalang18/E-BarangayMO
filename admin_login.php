@@ -14,7 +14,7 @@ $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
-    $_SESSION['adminID'] = $row['userID'];
+    $_SESSION['sessionAdminID'] = $row['userID'];
     header("Location: display_operator.php");
 } else {
     echo "Invalid cellphone number or password.";

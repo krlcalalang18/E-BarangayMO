@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['sessionAdminID'])){
+
+    header("Location: session_error_page_admin.php");
+}
+
+?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -47,6 +58,11 @@
         .tab.active {
             background-color: #004A8F;
         }
+
+        .tab.logout {
+            background-color: #FF0000;
+        }
+
 
         table {
             width: 100%;
@@ -145,14 +161,40 @@
         <div class="sidebar">
             <div class="profile">
                 <div class="profile-picture"></div>
-                <div class="profile-name">James Russell Saro</div>
+                <div class="profile-name">
+
+
+                <?php 
+                //GET SESSION DETAILS CONVERT TO NAME 
+                $testSession = $_SESSION['sessionAdminID'];
+                $conn = new mysqli('localhost', 'root', '', 'ebarangaydatabase');
+
+                if ($conn->connect_error) {
+                    die("Connection failed: " . $conn->connect_error);
+                }
+
+                $sql = "SELECT firstName, lastName FROM user WHERE userID = '$testSession' AND accountType = 'Administrator'";
+                $result = $conn->query($sql);
+
+                if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $SfirstName = $row['firstName'];
+                $SlastName = $row['lastName'];
+
+                echo "$SfirstName $SlastName";
+                } else {
+                }   
+                $conn->close();
+                ?>
+                </div>
                 <div class="profile-title">Administrator</div>
             </div>
             <div class="tabs">
-                <a href=""><div class="tab">Profile</div></a>
-                <a href="display_city.php"><div class="tab">Cities</div></a>
+                <a href="admin_profile.php"><div class="tab">Profile</div></a>
+                <a href="display_city.php"><div class="tab active">Cities</div></a>
                 <a href="display_barangay.php"><div class="tab">Barangays</div></a>
                 <a href="display_operator.php"><div class="tab">Operator Management</div></a>
+                <a href="logout_admin.php"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
             </div>
         </div>
         <div class="content">
