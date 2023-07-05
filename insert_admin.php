@@ -26,7 +26,9 @@ if ($conn->query($sql) === TRUE) {
                  VALUES (NULL, '$userID')";
 
     if ($conn->query($adminSQL) === TRUE) {
-        echo "Administrator record inserted successfully.";
+        
+        //HEADER
+        header("Location: admin_login_page.php");
     } else {
         echo "Error inserting administrator record: " . $conn->error;
     }

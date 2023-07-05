@@ -182,8 +182,8 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                 <a href="barangay_operator_profile.php"><div class="tab">Profile</div></a>
                 <a href="admin.php"><div class="tab">Pending Complaints</div></a>
                 <a href="adminProcessing.php"><div class="tab">Processing Complaints</div></a>
-                <a href="adminComplete.php"><div class="tab active">Completed Complaints</div></a>
-                <a href="adminUnfulfilled.php"><div class="tab">Unfulfilled Complaints</div></a>
+                <a href="adminComplete.php"><div class="tab">Completed Complaints</div></a>
+                <a href="adminUnfulfilled.php"><div class="tab active">Unfulfilled Complaints</div></a>
                 <a href="logout.php"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
             </div>
 
@@ -280,7 +280,7 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                 INNER JOIN user u ON ctn.userID = u.userID
                 INNER JOIN barangay_station bs ON bs.barangayID = c.barangayID
                 INNER JOIN city ct ON ct.cityID = bs.cityID
-                WHERE complaintStatus = 'Complete'";
+                WHERE complaintStatus = 'Unfulfilled'";
                 $result = $conn->query($sql);
 
                 if ($result->num_rows > 0) {
@@ -393,7 +393,7 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                                         <input type='text' class='form-control' rows='3' value='$complaintType' readonly>
                                         </div>             
 
-                                            <form method='POST' action='adminComplete.php'>
+                                            <form method='POST' action='adminUnfulfilled.php'>
                                                 <input type='hidden' name='complaintID' value='$complaintID'>
 
                                                 <div class='form-group'>
@@ -446,7 +446,6 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                                                 <h1> Are you sure you want to archive this record? </h1>
 
                                                 <button type='submit' name='archiveMe' class='btn btn-danger'>Delete</button>
-                                                
                                             </form>
                                         </div>
                                     </div>
