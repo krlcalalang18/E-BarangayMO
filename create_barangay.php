@@ -1,3 +1,37 @@
+
+<?php
+session_start();
+
+if (!isset($_SESSION['sessionAdminID'])){
+
+    header("Location: session_error_page_admin.php");
+}
+
+?>
+
+<?php 
+                //GET SESSION DETAILS CONVERT TO NAME 
+                $testSession = $_SESSION['sessionAdminID'];
+                $conn = new mysqli('localhost', 'root', '', 'ebarangaydatabase');
+
+                if ($conn->connect_error) {
+                    die("Connection failed: " . $conn->connect_error);
+                }
+
+                $sql = "SELECT firstName, lastName FROM user WHERE userID = '$testSession' AND accountType = 'Administrator'";
+                $result = $conn->query($sql);
+
+                if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $SfirstName = $row['firstName'];
+                $SlastName = $row['lastName'];
+
+                
+                } else {
+                }   
+                $conn->close();
+                ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -48,6 +82,11 @@
         .tab.active {
             background-color: #004A8F;
         }
+
+        .tab.logout {
+            background-color: #FF0000;
+        }
+
 
         table {
             width: 100%;
@@ -154,7 +193,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
 
     if ($stmt->affected_rows > 0) {
-        echo "Barangay created successfully.";
+        header('Location: display_barangay.php');
     } else {
         echo "Error creating barangay: " . $conn->error;
     }
@@ -170,14 +209,18 @@ $conn->close();
         <div class="sidebar">
             <div class="profile">
                 <div class="profile-picture"></div>
-                <div class="profile-name">James Russell Saro</div>
+                <div class="profile-name">
+                <?php echo "$SfirstName $SlastName"; ?>
+                </div>
                 <div class="profile-title">Administrator</div>
-            </div>
+            </div>s
             <div class="tabs">
-                <a href=""><div class="tab">Profile</div></a>
+                <a href="admin_profile.php"><div class="tab">Profile</div></a>
                 <a href="display_city.php"><div class="tab">Cities</div></a>
-                <a href="display_barangay.php"><div class="tab">Barangays</div></a>
-                <a href="display_operator.php"><div class="tab">Operator Management</div></a>
+                <a href="display_barangay.php"><div class="tab active">Barangays</div></a>
+                <a href="display_operator.php"><div class="tab">Barangay Operator Management</div></a>
+                <a href="display_lgu_operator.php"><div class="tab">LGU Operator Management</div></a>
+                <a href="adminBlockerPage.html"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
             </div>
         </div>
 
