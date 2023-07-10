@@ -1,18 +1,16 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['sessionAdminID'])){
+if (!isset($_SESSION['LGUOperatorID'])){
 
-    header("Location: session_error_page_admin.php");
+    header("Location: session_error_page_LGU.php");
 }
 
 ?>
 
-
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Add City</title>
+<head>    <title>LGU Operator - Audit Logs</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
 
@@ -26,6 +24,7 @@ if (!isset($_SESSION['sessionAdminID'])){
         .container {
             display: flex;
             height: 100vh;
+            width: auto;
         }
 
         .sidebar {
@@ -62,7 +61,6 @@ if (!isset($_SESSION['sessionAdminID'])){
         .tab.logout {
             background-color: #FF0000;
         }
-
 
         table {
             width: 100%;
@@ -142,7 +140,6 @@ if (!isset($_SESSION['sessionAdminID'])){
         }
 
     </style>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
     <?php
@@ -153,21 +150,19 @@ if (!isset($_SESSION['sessionAdminID'])){
         die("Connection failed: " . $conn->connect_error);
     }
 
-    if (isset($_POST['createCity'])) {
-        $cityName = $_POST['cityName'];
-        $cityExpiry = $_POST['cityExpiry'];
-    
-        $stmt = $conn->prepare("INSERT INTO city (cityName, cityExpiry) VALUES (?, ?)");
-        $stmt->bind_param("ss", $cityName, $cityExpiry);
+    // DELETE BUTTON
+    if (isset($_POST["delete"])) {
+        $complaintId = $_POST["complaint_id"];
+
+        $stmt = $conn->prepare("DELETE FROM pendingComplaints WHERE complaintID = ?");
+        $stmt->bind_param("i", $complaintId);
         $stmt->execute();
+
         $stmt->close();
-    
-        header('Location: display_city.php');
-
     }
-    
-    $conn->close();
 
+    $btnview = 'btn-view';
+    $btnarchive = 'btn-archive';
 
     ?>
 
@@ -180,14 +175,14 @@ if (!isset($_SESSION['sessionAdminID'])){
 
                 <?php 
                 //GET SESSION DETAILS CONVERT TO NAME 
-                $testSession = $_SESSION['sessionAdminID'];
+                $testSession = $_SESSION['LGUOperatorID'];
                 $conn = new mysqli('localhost', 'root', '', 'ebarangaydatabase');
 
                 if ($conn->connect_error) {
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                $sql = "SELECT firstName, lastName FROM user WHERE userID = '$testSession' AND accountType = 'Administrator'";
+                $sql = "SELECT firstName, lastName FROM user WHERE userID = '$testSession' AND accountType = 'LGU Operator'";
                 $result = $conn->query($sql);
 
                 if ($result->num_rows > 0) {
@@ -200,35 +195,79 @@ if (!isset($_SESSION['sessionAdminID'])){
                 }   
                 $conn->close();
                 ?>
+
                 </div>
-                <div class="profile-title">Administrator</div>
+                <div class="profile-title">LGU Operator</div>
             </div>
             <div class="tabs">
-            <a href="admin_profile.php"><div class="tab">Profile</div></a>
-                <a href="display_city.php"><div class="tab active">Cities</div></a>
-                <a href="display_barangay.php"><div class="tab">Barangays</div></a>
-                <a href="display_operator.php"><div class="tab">Barangay Operator Management</div></a>
-                <a href="display_lgu_operator.php"><div class="tab">LGU Operator Management</div></a>
-                <a href="adminBlockerPage.html"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
+                <a href="lgu_operator_profile.php"><div class="tab">Profile</div></a>
+                <a href="dashboard.php"><div class="tab">Dashboard</div></a>
+                <a href="display_citizen.php"><div class="tab">Citizen Verification</div></a>
+                <a href="audit_logs.php"><div class="tab active">Audit Logs</div></a>
+                <a href="logout_LGU.php"><div class="tab logout">Log Out</div></a>
             </div>
+
         </div>
         <div class="content">
-        <h1>Add City</h1>
-        <form method="POST" action="create_city.php">
-            <div class="form-group">
-                <label for="cityName">City Name:</label>
-                <input type="text" class="form-control" id="cityName" name="cityName" required>
-            </div>
-            <div class="form-group">
-                <label for="cityExpiry">City Expiry:</label>
-                <input type="datetime-local" class="form-control" id="cityExpiry" name="cityExpiry" required>
-            </div>
-            <button type="submit" name="createCity"class="btn btn-success">Create</button>
-        </form>
-    </div>
-        </div>
-    </div>
+        <h2>Audit Logs</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Log ID</th>
+                    <th>Operator</th>
+                    <th>Action</th>
+                    <th>Date and Time</th>
+                    <th>Complaint ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $conn = new mysqli("localhost", "root", "", "ebarangaydatabase");
+                if ($conn->connect_error) {
+                    die("Connection failed: " . $conn->connect_error);
+                }
 
-</body>
+                
+
+                $sql2 = "SELECT lt.logID, CONCAT(u.firstName, ' ', u.lastName) AS operatorName, lt.operation, lt.dateAndTime, lt.complaintID
+                        FROM logs_table lt
+                        INNER JOIN barangay_operator bo ON bo.brgyOperatorID = lt.brgyOperatorID
+                        INNER JOIN user u ON u.userID = bo.userID
+                        ORDER BY lt.logID DESC";
+                $result2 = $conn->query($sql2);
+
+                if ($result2->num_rows > 0) {
+                    while ($row = $result2->fetch_assoc()) {
+
+                        $logID = $row['logID'];
+                        $operatorName = $row['operatorName'];
+                        $operation = $row['operation'];
+                        $dateAndTime = $row['dateAndTime'];
+                        $complaintID = $row['complaintID'];
+
+                        if ($complaintID == 0 || $complaintID == null){
+                            $complaintID = 'N/A';
+                        }
+
+                        echo "<tr>
+                                <td>$logID</td>
+                                <td>$operatorName</td>
+                                <td>$operation</td>
+                                <td>$dateAndTime</td>
+                                <td>$complaintID</td>
+
+                            </tr>";
+
+                    }
+                } else {
+                    echo "<tr><td colspan='14'>Error</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 </body>
 </html>

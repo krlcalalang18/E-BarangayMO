@@ -3,8 +3,18 @@
 <head>
     <title>Admin Registration</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="create_admin.css">
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+        .error {
+            color: red;
+        }
+    </style>
 </head>
 <body>
+    <img src="Logo.png" class="logo">
     <div class="container">
         <h1>Admin Registration</h1>
         <form method="POST" action="insert_admin.php">
