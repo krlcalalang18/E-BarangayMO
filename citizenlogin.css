@@ -1,0 +1,44 @@
+body
+{
+    margin: 0;
+    padding: 0;
+    background: #ADD8E6;
+}
+
+h1
+{
+    position: relative;
+    top: -80px;
+    text-align: center;
+}
+
+.form-group
+{
+    position: relative;
+    top: -80px;
+    font-size: 18px;
+    background: white;
+    border-radius: 10px;
+}
+
+.button
+{
+    position: relative;
+    top: -80px;
+}
+
+.reg-link
+{
+    position: relative;
+    top: -80px;
+}
+
+.logo
+{
+    display: inline-block;
+    margin-left: 710px;
+    margin-right: auto;
+    width: 135px;
+    height: 135px;    
+}
+

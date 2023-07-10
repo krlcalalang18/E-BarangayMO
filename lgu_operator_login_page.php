@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Brgy Operator Login</title>
+    <title>LGU Operator Login</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="brgyoperatorloginpage.css">
+    <link rel="stylesheet" href="lguoperatorloginpage.css">
     <style>
         .container {
             margin-top: 100px;
@@ -14,9 +14,9 @@
 <body>
     <img src="Logo.png" class="logo">
     <div class="container">
-        <h1>Barangay Operator Login</h1>
+        <h1>LGU Operator Login</h1>
 
-        <form method="POST" action="brgy_login.php">
+        <form method="POST" action="lgu_operator_login.php">
             <div class="form-group">
                 <label for="cellphoneNumber">Cellphone Number</label>
                 <input type="text" class="form-control" id="cellphoneNumber" name="cellphoneNumber" required>
@@ -35,7 +35,7 @@
         <a href="adminBlockerPage.html"> Administrator</a>
         </div>
         <div class="link-b">
-        <a href="lgu_operator_login_page.php"> LGU Operator</a>
+        <a href="index.php"> Barangay Operator</a>
         </div>
         <div class="reg-c">
         <a href="change_password_web.php"> Forgot Password?</a>

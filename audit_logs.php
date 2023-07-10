@@ -1,9 +1,10 @@
+
 <?php
 session_start();
 
-if (!isset($_SESSION['sessionAdminID'])){
+if (!isset($_SESSION['LGUOperatorID'])){
 
-    header("Location: session_error_page_admin.php");
+    header("Location: session_error_page_LGU.php");
 }
 
 ?>
@@ -12,7 +13,7 @@ if (!isset($_SESSION['sessionAdminID'])){
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add City</title>
+    <title>LGU Operator Profile</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
 
@@ -26,6 +27,7 @@ if (!isset($_SESSION['sessionAdminID'])){
         .container {
             display: flex;
             height: 100vh;
+            width: auto;
         }
 
         .sidebar {
@@ -62,7 +64,6 @@ if (!isset($_SESSION['sessionAdminID'])){
         .tab.logout {
             background-color: #FF0000;
         }
-
 
         table {
             width: 100%;
@@ -142,7 +143,6 @@ if (!isset($_SESSION['sessionAdminID'])){
         }
 
     </style>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
     <?php
@@ -153,41 +153,39 @@ if (!isset($_SESSION['sessionAdminID'])){
         die("Connection failed: " . $conn->connect_error);
     }
 
-    if (isset($_POST['createCity'])) {
-        $cityName = $_POST['cityName'];
-        $cityExpiry = $_POST['cityExpiry'];
-    
-        $stmt = $conn->prepare("INSERT INTO city (cityName, cityExpiry) VALUES (?, ?)");
-        $stmt->bind_param("ss", $cityName, $cityExpiry);
+    // DELETE BUTTON
+    if (isset($_POST["delete"])) {
+        $complaintId = $_POST["complaint_id"];
+
+        $stmt = $conn->prepare("DELETE FROM pendingComplaints WHERE complaintID = ?");
+        $stmt->bind_param("i", $complaintId);
         $stmt->execute();
+
         $stmt->close();
-    
-        header('Location: display_city.php');
-
     }
-    
-    $conn->close();
 
+    $btnview = 'btn-view';
+    $btnarchive = 'btn-archive';
 
     ?>
 
 <body>
     <div class="container">
         <div class="sidebar">
-            <div class="profile">
+        <div class="profile">
                 <div class="profile-picture"></div>
                 <div class="profile-name">
 
                 <?php 
                 //GET SESSION DETAILS CONVERT TO NAME 
-                $testSession = $_SESSION['sessionAdminID'];
+                $testSession = $_SESSION['LGUOperatorID'];
                 $conn = new mysqli('localhost', 'root', '', 'ebarangaydatabase');
 
                 if ($conn->connect_error) {
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                $sql = "SELECT firstName, lastName FROM user WHERE userID = '$testSession' AND accountType = 'Administrator'";
+                $sql = "SELECT firstName, lastName FROM user WHERE userID = '$testSession' AND accountType = 'LGU Operator'";
                 $result = $conn->query($sql);
 
                 if ($result->num_rows > 0) {
@@ -200,35 +198,62 @@ if (!isset($_SESSION['sessionAdminID'])){
                 }   
                 $conn->close();
                 ?>
+
                 </div>
-                <div class="profile-title">Administrator</div>
+                <div class="profile-title">LGU Operator</div>
             </div>
             <div class="tabs">
-            <a href="admin_profile.php"><div class="tab">Profile</div></a>
-                <a href="display_city.php"><div class="tab active">Cities</div></a>
-                <a href="display_barangay.php"><div class="tab">Barangays</div></a>
-                <a href="display_operator.php"><div class="tab">Barangay Operator Management</div></a>
-                <a href="display_lgu_operator.php"><div class="tab">LGU Operator Management</div></a>
-                <a href="adminBlockerPage.html"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
+                <a href="lgu_operator_profile.php"><div class="tab">Profile</div></a>
+                <a href="dashboard.php"><div class="tab">Dashboard</div></a>
+                <a href="display_citizen.php"><div class="tab">Citizen Verification</div></a>
+                <a href="audit_logs.php"><div class="tab active">Audit Logs</div></a>
+                <a href="logout_LGU.php"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
             </div>
+
         </div>
         <div class="content">
-        <h1>Add City</h1>
-        <form method="POST" action="create_city.php">
-            <div class="form-group">
-                <label for="cityName">City Name:</label>
-                <input type="text" class="form-control" id="cityName" name="cityName" required>
-            </div>
-            <div class="form-group">
-                <label for="cityExpiry">City Expiry:</label>
-                <input type="datetime-local" class="form-control" id="cityExpiry" name="cityExpiry" required>
-            </div>
-            <button type="submit" name="createCity"class="btn btn-success">Create</button>
-        </form>
-    </div>
-        </div>
-    </div>
+        <h2>Audit Logs</h2>
+        <?php
 
-</body>
+// Create connection
+$conn = new mysqli('localhost','root','','ebarangaydatabase');
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch audit trail records
+$sql = "SELECT * FROM audit_trail ORDER BY created_at DESC";
+$result = $conn->query($sql);
+
+// Display the audit trail records in a table
+echo "<table>";
+echo "<tr><th>ID</th><th>User ID</th><th>Action</th><th>Table Name</th><th>Record ID</th><th>Created At</th></tr>";
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        echo "<tr>";
+        echo "<td>" . $row['id'] . "</td>";
+        echo "<td>" . $row['user_id'] . "</td>";
+        echo "<td>" . $row['action'] . "</td>";
+        echo "<td>" . $row['table_name'] . "</td>";
+        echo "<td>" . $row['record_id'] . "</td>";
+        echo "<td>" . $row['created_at'] . "</td>";
+        echo "</tr>";
+    }
+} else {
+    echo "<tr><td colspan='6'>No audit trail records found.</td></tr>";
+}
+echo "</table>";
+
+// Close the database connection
+$conn->close();
+?>
+            </tbody>
+        </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 </body>
 </html>
