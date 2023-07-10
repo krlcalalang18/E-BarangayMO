@@ -1,4 +1,11 @@
 <?php
+
+session_start();
+
+if (!isset($_SESSION['sessionAdminID'])){
+
+    header("Location: session_error_page_admin.php");
+}
 $conn = new mysqli('localhost', 'root', '', 'ebarangaydatabase');
 
 if ($conn->connect_error) {

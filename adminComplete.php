@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['sessionBrgyOperatorID'])){
+
+    header("Location: session_error_page.php");
+}
+
+?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -47,6 +58,10 @@
 
         .tab.active {
             background-color: #004A8F;
+        }
+
+        .tab.logout {
+            background-color: #FF0000;
         }
 
         table {
@@ -129,43 +144,47 @@
     </style>
 </head>
 <body>
-    <?php
-
-    $conn = new mysqli('localhost','root','','ebarangaydatabase');
-
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    // DELETE BUTTON
-    if (isset($_POST["delete"])) {
-        $complaintId = $_POST["complaint_id"];
-
-        $stmt = $conn->prepare("DELETE FROM pendingComplaints WHERE complaintID = ?");
-        $stmt->bind_param("i", $complaintId);
-        $stmt->execute();
-
-        $stmt->close();
-    }
-
-    $btnview = 'btn-view';
-    $btnarchive = 'btn-archive';
-
-    ?>
 
 <body>
     <div class="container">
         <div class="sidebar">
             <div class="profile">
                 <div class="profile-picture"></div>
-                <div class="profile-name">Juan Dela Cruz</div>
+                <div class="profile-name">
+
+                <?php 
+                //GET SESSION DETAILS CONVERT TO NAME 
+                $testSession = $_SESSION['sessionBrgyOperatorID'];
+                $conn = new mysqli('localhost', 'root', '', 'ebarangaydatabase');
+
+                if ($conn->connect_error) {
+                    die("Connection failed: " . $conn->connect_error);
+                }
+
+                $sql = "SELECT firstName, lastName FROM user WHERE userID = '$testSession' AND accountType = 'Barangay Operator'";
+                $result = $conn->query($sql);
+
+                if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $SfirstName = $row['firstName'];
+                $SlastName = $row['lastName'];
+
+                echo "$SfirstName $SlastName";
+                } else {
+                }   
+                $conn->close();
+                ?>
+
+                </div>
                 <div class="profile-title">Barangay Operator</div>
             </div>
             <div class="tabs">
-                <a href="brgyAdminProfile.html"><div class="tab">Profile</div></a>
+                <a href="barangay_operator_profile.php"><div class="tab">Profile</div></a>
                 <a href="admin.php"><div class="tab">Pending Complaints</div></a>
                 <a href="adminProcessing.php"><div class="tab">Processing Complaints</div></a>
                 <a href="adminComplete.php"><div class="tab active">Completed Complaints</div></a>
+                <a href="adminUnfulfilled.php"><div class="tab">Unfulfilled Complaints</div></a>
+                <a href="logout.php"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
             </div>
 
         </div>
@@ -192,8 +211,8 @@
             <tbody>
 
             <?php
-                // UPDATE DETAILS (NO MEDIA YET)
-                if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+                if (isset($_POST['updateMe'])) {
                     $complaintID = $_POST["complaintID"];
                     $status = $_POST["status"];
                     $remarks = $_POST["remarks"];
@@ -206,13 +225,45 @@
 
                     $sql = "UPDATE complaint SET complaintStatus = '$status', remarks = '$remarks', priorityLevel = '$priority' WHERE complaintID = $complaintID";
                     if ($conn->query($sql) === TRUE) {
-                        echo "Complaint updated successfully";
+                        echo "Complaint updated successfully!";
                     } else {
-                        echo "Error updating complaint: " . $conn->error;
+                        echo "Error updating complaint.";
                     }
 
-                $conn->close();
-}
+                    $conn->close();
+                }
+
+                if(isset($_POST['archiveMe'])){
+
+                        $complaintID = $_POST["DcomplaintID"];
+                        $status = $_POST["Dstatus"];
+
+                        $conn = new mysqli("localhost", "root", "", "ebarangaydatabase");
+                        if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
+                        }
+    
+                        $sql2 = "UPDATE complaint 
+                                SET complaintStatus = 'Archived'
+                                WHERE complaintID = $complaintID";
+                        if ($conn->query($sql2) === TRUE) {
+                            
+                            $sql3 = "INSERT INTO archived_complaint (complaintID)
+                                     SELECT complaintID
+                                     FROM complaint
+                                     WHERE complaintID = $complaintID";
+                                if ($conn->query($sql3) == TRUE) {
+                                    echo "Complaint archived successfully!";
+                                } 
+                                else {
+                                    echo "Error updating complaint.";
+                                }
+    
+                        } else {
+                            echo "Error updating complaint.";
+                        }
+                        $conn->close();
+                    }
 ?>
 
 
@@ -223,12 +274,14 @@
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                $sql = "SELECT DISTINCT c.complaintID, CONCAT(u.firstName, ' ', u.lastName) AS ComplainantName, u.cellphoneNumber AS ComplainantCellphoneNo, c.complaintDateAndTime, c.complaintAddress, ct.cityName AS City, bs.barangayName AS Barangay, c.complaintDetails, c.complaintType, c.priorityLevel, c.complaintStatus, c.complaintEvidence, c.remarks, c.remarksEvidence
-                        FROM complaint c
-                        INNER JOIN user u ON c.citizenID = u.userID
-                        INNER JOIN barangay_station bs ON c.barangayID = bs.barangayID
-                        INNER JOIN city ct ON c.barangayID = bs.cityID
-                        WHERE complaintStatus = 'Complete'";
+                $sql = "SELECT c.complaintID, CONCAT(u.firstName, ' ', u.lastName) AS ComplainantName, u.cellphoneNumber AS ComplainantCellphoneNo, c.complaintDateAndTime, c.complaintAddress, ct.cityName AS City, bs.barangayName AS Barangay, c.complaintDetails, c.complaintType, c.priorityLevel, c.complaintStatus, c.complaintEvidence, c.remarks, c.remarksEvidence
+                FROM complaint c
+                INNER JOIN citizen ctn ON ctn.citizenID = c.citizenID
+                INNER JOIN user u ON ctn.userID = u.userID
+                INNER JOIN barangay_station bs ON bs.barangayID = c.barangayID
+                INNER JOIN city ct ON ct.cityID = bs.cityID
+                WHERE complaintStatus = 'Complete'
+                ORDER BY c.complaintID DESC";
                 $result = $conn->query($sql);
 
                 if ($result->num_rows > 0) {
@@ -267,7 +320,7 @@
                                     </button>
                                 </td>
                                 <td>
-                                    <button type='button' class='btn btn-danger'>
+                                <button type='button' class='btn btn-danger' data-toggle='modal' data-target='#deleteModal$complaintID'>
                                         Archive
                                     </button>
                                 </td>
@@ -330,13 +383,18 @@
                                         <label for='remarks'>Evidence:</label>
                                         <img src='data:image/jpeg;base64,$complaintEvidence' style='width: 100px; height: 100px;'>
                                         </div>
+                                        
+                                        <div class='form-group'>
+                                        <label for='remarks'>Remarks Evidence:</label>
+                                        <img src='data:image/jpeg;base64,$remarksEvidence' style='width: 100px; height: 100px;'>
+                                        </div>
 
                                         <div class='form-group'>
                                         <label for='remarks'>Complaint Type</label>
                                         <input type='text' class='form-control' rows='3' value='$complaintType' readonly>
                                         </div>             
 
-                                            <form method='POST' action=''>
+                                            <form method='POST' action='adminComplete.php'>
                                                 <input type='hidden' name='complaintID' value='$complaintID'>
 
                                                 <div class='form-group'>
@@ -345,6 +403,7 @@
                                                         <option value='Pending' " . ($complaintStatus == 'Pending' ? 'selected' : '') . ">Pending</option>
                                                         <option value='Processing' " . ($complaintStatus == 'Processing' ? 'selected' : '') . ">Processing</option>
                                                         <option value='Complete' " . ($complaintStatus == 'Complete' ? 'selected' : '') . ">Complete</option>
+                                                        <option value='Unfulfilled' " . ($complaintStatus == 'Unfulfilled' ? 'selected' : '') . ">Unfulfilled</option>
                                                     </select>
                                                 </div>
 
@@ -361,11 +420,34 @@
                                                     <input type='text' class='form-control' name='remarks' value='$remarks'>
                                                 </div>
 
-                                                <div class='form-group'>
-                                                    <label for='remarksEvidence'>Remarks Evidence</label>
-                                                    <input type='file' class='form-control' name='remarksEvidence'>
-                                                </div>
-                                                <button type='submit' class='btn btn-primary'>Update</button>
+                                                <button type='submit' name='updateMe' class='btn btn-primary'>Update</button>
+                                                <button type='button' class='btn btn-success'>Print</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>";
+
+                            //DELETE MODAL
+                            echo "<div class='modal fade' id='deleteModal$complaintID' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
+                                <div class='modal-dialog' role='document'>
+                                    <div class='modal-content'>
+                                        <div class='modal-header'>
+                                            <h5 class='modal-title' id='myModalLabel'>Delete Confirmation</h5>
+                                            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                                                <span aria-hidden='true'>&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class='modal-body'>
+
+                                            <form method='POST' action='adminComplete.php'>
+                                            <input type='hidden' name='DcomplaintID' value='$complaintID'>
+                                            <input type='hidden' name='Dstatus' value='$complaintStatus'>
+
+                                                <h1> Are you sure you want to archive this record? </h1>
+
+                                                <button type='submit' name='archiveMe' class='btn btn-danger'>Delete</button>
+                                                
                                             </form>
                                         </div>
                                     </div>

@@ -201,6 +201,13 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
         </div>
         <div class="content">
         <h2>Complaint Records</h2>
+        
+        
+        <form action="" method="GET">
+        <input type="text" name="search" placeholder="Search complaints...">
+        <button type="submit">Search</button>
+        </form> 
+        
         <table class="table">
             <thead>
                 <tr>
@@ -221,40 +228,97 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
             </thead>
             <tbody>
 
+
+             <?php
+// MySQL database credentials
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "ebarangaydatabase";
+
+// Create a connection to the database
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check the connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Function to search for complaint records based on the provided search query
+function searchComplaints($conn, $searchQuery)
+{
+    $results = [];
+    
+    // Prepare the SQL statement with placeholders for the search query
+    $sql = "SELECT c.complaintID, CONCAT(u.firstName, ' ', u.lastName) AS ComplainantName, u.cellphoneNumber AS ComplainantCellphoneNo, c.complaintDateAndTime, c.complaintAddress, ct.cityName AS City, bs.barangayName AS Barangay, c.complaintDetails, c.complaintType, c.priorityLevel, c.complaintStatus, c.complaintEvidence, c.remarks, c.remarksEvidence
+    FROM complaint c
+    INNER JOIN citizen ctn ON ctn.citizenID = c.citizenID
+    INNER JOIN user u ON ctn.userID = u.userID
+    INNER JOIN barangay_station bs ON bs.barangayID = c.barangayID
+    INNER JOIN city ct ON ct.cityID = bs.cityID
+            WHERE
+            LOWER(c.complaintID) LIKE ? OR
+            LOWER(complainantName) LIKE ? OR
+            LOWER(ComplainantCellphoneNo) LIKE ? OR
+            LOWER(c.complaintDateAndTime) LIKE ? OR
+            LOWER(c.complaintAddress) LIKE ? OR
+            LOWER(City) LIKE ? OR
+            LOWER(Barangay) LIKE ? OR
+            LOWER(c.complaintDetails) LIKE ? OR
+            LOWER(c.complaintType) LIKE ? OR
+            LOWER(c.priorityLevel) LIKE ? OR
+            LOWER(c.complaintStatus) LIKE ? OR
+            LOWER(c.remarks) LIKE ?";
+
+    // Bind the search query to the statement
+    $stmt = $conn->prepare($sql);
+    $searchParam = "%" . strtolower($searchQuery) . "%";
+    $stmt->bind_param("ssssssssssss", $searchParam, $searchParam, $searchParam, $searchParam, $searchParam, $searchParam, $searchParam, $searchParam, $searchParam, $searchParam, $searchParam, $searchParam);
+
+    // Execute the statement
+    $stmt->execute();
+
+    // Get the result set
+    $result = $stmt->get_result();
+
+    // Fetch the rows as associative arrays
+    while ($row = $result->fetch_assoc()) {
+        $results[] = $row;
+    }
+
+    // Close the statement
+    $stmt->close();
+
+    return $results;
+}
+
+// Check if a search query is submitted
+if (isset($_GET['search'])) {
+    // Get the search query from the form input
+    $searchQuery = $_GET['search'];
+
+    // Call the searchComplaints function to get the search results
+    $searchResults = searchComplaints($conn, $searchQuery);
+} else {
+    // If no search query is submitted, display all complaint records
+    $sql = "SELECT * FROM complaint";
+    $result = $conn->query($sql);
+
+    $searchResults = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $searchResults[] = $row;
+        }
+    }
+}
+
+// Close the database connection
+$conn->close();
+?>
+
+
             <?php
-
-                    if(isset($_POST['archiveMe'])){
-
-                        $complaintID = $_POST["DcomplaintID"];
-                        $status = $_POST["Dstatus"];
-
-                        $conn = new mysqli("localhost", "root", "", "ebarangaydatabase");
-                        if ($conn->connect_error) {
-                        die("Connection failed: " . $conn->connect_error);
-                        }
-    
-                        $sql2 = "UPDATE complaint 
-                                SET complaintStatus = 'Archived'
-                                WHERE complaintID = $complaintID";
-                        if ($conn->query($sql2) === TRUE) {
-                            
-                            $sql3 = "INSERT INTO archived_complaint (complaintID)
-                                     SELECT complaintID
-                                     FROM complaint
-                                     WHERE complaintID = $complaintID";
-                                if ($conn->query($sql3) == TRUE) {
-                                    echo "Complaint archived successfully!";
-                                } 
-                                else {
-                                    echo "Error updating complaint.";
-                                }
-    
-                        } else {
-                            echo "Error updating complaint.";
-                        }
-                        $conn->close();
-                    }
-                if (isset($_POST['updateMe'])) {
+                if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $complaintID = $_POST["complaintID"];
                     $status = $_POST["status"];
                     $remarks = $_POST["remarks"];
@@ -284,27 +348,16 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                $testSession = $_SESSION['sessionBrgyOperatorID'];
-
-                $sqlGetBrgy = "SELECT barangayID
-                               FROM barangay_operator bo
-                               INNER JOIN user u ON u.userID = bo.userID
-                               WHERE u.userID = '$testSession'";
-                $resultBrgy = $conn->query($sqlGetBrgy);
-                if ($resultBrgy->num_rows > 0){
-                    $row = $resultBrgy->fetch_assoc();
-                    $brgyID = $row['barangayID'];
-                }
-
                 $sql = "SELECT c.complaintID, CONCAT(u.firstName, ' ', u.lastName) AS ComplainantName, u.cellphoneNumber AS ComplainantCellphoneNo, c.complaintDateAndTime, c.complaintAddress, ct.cityName AS City, bs.barangayName AS Barangay, c.complaintDetails, c.complaintType, c.priorityLevel, c.complaintStatus, c.complaintEvidence, c.remarks, c.remarksEvidence
                 FROM complaint c
                 INNER JOIN citizen ctn ON ctn.citizenID = c.citizenID
                 INNER JOIN user u ON ctn.userID = u.userID
                 INNER JOIN barangay_station bs ON bs.barangayID = c.barangayID
                 INNER JOIN city ct ON ct.cityID = bs.cityID
-                WHERE c.complaintStatus = 'Pending' AND c.barangayID = '$brgyID'
-                ORDER BY c.complaintID DESC";
+                WHERE complaintStatus = 'Pending'";
                 $result = $conn->query($sql);
+
+                //lololololo
 
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
@@ -342,9 +395,9 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                                     </button>
                                 </td>
                                 <td>
-                                <button type='button' class='btn btn-danger' data-toggle='modal' data-target='#deleteModal$complaintID'>
-                                Archive
-                            </button>
+                                    <button type='button' class='btn btn-danger'>
+                                        Archive
+                                    </button>
                                 </td>
                             </tr>";
 
@@ -436,34 +489,8 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                                                     <input type='text' class='form-control' name='remarks' value='$remarks'>
                                                 </div>
 
-                                                <button type='submit' name='updateMe' class='btn btn-primary'>Update</button> 
+                                                <button type='submit' class='btn btn-primary'>Update</button> 
                                                 <button type='button' class='btn btn-success'>Print</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>";
-
-                            //DELETE MODAL
-                            echo "<div class='modal fade' id='deleteModal$complaintID' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-                                <div class='modal-dialog' role='document'>
-                                    <div class='modal-content'>
-                                        <div class='modal-header'>
-                                            <h5 class='modal-title' id='myModalLabel'>Delete Confirmation</h5>
-                                            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
-                                                <span aria-hidden='true'>&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class='modal-body'>
-
-                                            <form method='POST' action='admin.php'>
-                                            <input type='hidden' name='DcomplaintID' value='$complaintID'>
-                                            <input type='hidden' name='Dstatus' value='$complaintStatus'>
-
-                                                <h1> Are you sure you want to archive this record? </h1>
-
-                                                <button type='submit' name='archiveMe' class='btn btn-danger'>Delete</button>
-                                                
                                             </form>
                                         </div>
                                     </div>
@@ -478,6 +505,8 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
             </tbody>
         </table>
     </div>
+
+   
 
 
     

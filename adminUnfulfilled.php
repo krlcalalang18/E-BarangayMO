@@ -8,14 +8,12 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
 
 ?>
 
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Barangay Operator - Pending Complaints</title>
+    <title>Barangay Operator - Completed Complaints</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <style>
 
         body {
@@ -146,15 +144,6 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
     </style>
 </head>
 <body>
-    <?php
-
-    $conn = new mysqli('localhost','root','','ebarangaydatabase');
-
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    ?>
 
 <body>
     <div class="container">
@@ -191,11 +180,11 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
             </div>
             <div class="tabs">
                 <a href="barangay_operator_profile.php"><div class="tab">Profile</div></a>
-                <a href="admin.php"><div class="tab active">Pending Complaints</div></a>
+                <a href="admin.php"><div class="tab">Pending Complaints</div></a>
                 <a href="adminProcessing.php"><div class="tab">Processing Complaints</div></a>
                 <a href="adminComplete.php"><div class="tab">Completed Complaints</div></a>
-                <a href="adminUnfulfilled.php"><div class="tab">Unfulfilled Complaints</div></a>
-                <a href="logout.php"><div class="tab logout">Log Out</div></a>
+                <a href="adminUnfulfilled.php"><div class="tab active">Unfulfilled Complaints</div></a>
+                <a href="logout.php"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
             </div>
 
         </div>
@@ -223,7 +212,28 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
 
             <?php
 
-                    if(isset($_POST['archiveMe'])){
+                if (isset($_POST['updateMe'])) {
+                    $complaintID = $_POST["complaintID"];
+                    $status = $_POST["status"];
+                    $remarks = $_POST["remarks"];
+                    $priority = $_POST["priority"];
+
+                    $conn = new mysqli("localhost", "root", "", "ebarangaydatabase");
+                    if ($conn->connect_error) {
+                    die("Connection failed: " . $conn->connect_error);
+                    }
+
+                    $sql = "UPDATE complaint SET complaintStatus = '$status', remarks = '$remarks', priorityLevel = '$priority' WHERE complaintID = $complaintID";
+                    if ($conn->query($sql) === TRUE) {
+                        echo "Complaint updated successfully!";
+                    } else {
+                        echo "Error updating complaint.";
+                    }
+
+                    $conn->close();
+                }
+
+                if(isset($_POST['archiveMe'])){
 
                         $complaintID = $_POST["DcomplaintID"];
                         $status = $_POST["Dstatus"];
@@ -254,46 +264,14 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                         }
                         $conn->close();
                     }
-                if (isset($_POST['updateMe'])) {
-                    $complaintID = $_POST["complaintID"];
-                    $status = $_POST["status"];
-                    $remarks = $_POST["remarks"];
-                    $priority = $_POST["priority"];
-
-                    $conn = new mysqli("localhost", "root", "", "ebarangaydatabase");
-                    if ($conn->connect_error) {
-                    die("Connection failed: " . $conn->connect_error);
-                    }
-
-                    $sql = "UPDATE complaint 
-                            SET complaintStatus = '$status', remarks = '$remarks', priorityLevel = '$priority'
-                            WHERE complaintID = $complaintID";
-                    if ($conn->query($sql) === TRUE) {
-                        echo "Complaint updated successfully!";
-                    } else {
-                        echo "Error updating complaint.";
-                    }
-
-                $conn->close();
-}
 ?>
+
+
 
                 <?php
                 $conn = new mysqli("localhost", "root", "", "ebarangaydatabase");
                 if ($conn->connect_error) {
                     die("Connection failed: " . $conn->connect_error);
-                }
-
-                $testSession = $_SESSION['sessionBrgyOperatorID'];
-
-                $sqlGetBrgy = "SELECT barangayID
-                               FROM barangay_operator bo
-                               INNER JOIN user u ON u.userID = bo.userID
-                               WHERE u.userID = '$testSession'";
-                $resultBrgy = $conn->query($sqlGetBrgy);
-                if ($resultBrgy->num_rows > 0){
-                    $row = $resultBrgy->fetch_assoc();
-                    $brgyID = $row['barangayID'];
                 }
 
                 $sql = "SELECT c.complaintID, CONCAT(u.firstName, ' ', u.lastName) AS ComplainantName, u.cellphoneNumber AS ComplainantCellphoneNo, c.complaintDateAndTime, c.complaintAddress, ct.cityName AS City, bs.barangayName AS Barangay, c.complaintDetails, c.complaintType, c.priorityLevel, c.complaintStatus, c.complaintEvidence, c.remarks, c.remarksEvidence
@@ -302,7 +280,7 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                 INNER JOIN user u ON ctn.userID = u.userID
                 INNER JOIN barangay_station bs ON bs.barangayID = c.barangayID
                 INNER JOIN city ct ON ct.cityID = bs.cityID
-                WHERE c.complaintStatus = 'Pending' AND c.barangayID = '$brgyID'
+                WHERE complaintStatus = 'Unfulfilled'
                 ORDER BY c.complaintID DESC";
                 $result = $conn->query($sql);
 
@@ -343,8 +321,8 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                                 </td>
                                 <td>
                                 <button type='button' class='btn btn-danger' data-toggle='modal' data-target='#deleteModal$complaintID'>
-                                Archive
-                            </button>
+                                        Archive
+                                    </button>
                                 </td>
                             </tr>";
 
@@ -405,13 +383,18 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                                         <label for='remarks'>Evidence:</label>
                                         <img src='data:image/jpeg;base64,$complaintEvidence' style='width: 100px; height: 100px;'>
                                         </div>
+                                        
+                                        <div class='form-group'>
+                                        <label for='remarks'>Remarks Evidence:</label>
+                                        <img src='data:image/jpeg;base64,$remarksEvidence' style='width: 100px; height: 100px;'>
+                                        </div>
 
                                         <div class='form-group'>
                                         <label for='remarks'>Complaint Type</label>
                                         <input type='text' class='form-control' rows='3' value='$complaintType' readonly>
                                         </div>             
 
-                                            <form method='POST' action=''>
+                                            <form method='POST' action='adminUnfulfilled.php'>
                                                 <input type='hidden' name='complaintID' value='$complaintID'>
 
                                                 <div class='form-group'>
@@ -420,6 +403,7 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                                                         <option value='Pending' " . ($complaintStatus == 'Pending' ? 'selected' : '') . ">Pending</option>
                                                         <option value='Processing' " . ($complaintStatus == 'Processing' ? 'selected' : '') . ">Processing</option>
                                                         <option value='Complete' " . ($complaintStatus == 'Complete' ? 'selected' : '') . ">Complete</option>
+                                                        <option value='Unfulfilled' " . ($complaintStatus == 'Unfulfilled' ? 'selected' : '') . ">Unfulfilled</option>
                                                     </select>
                                                 </div>
 
@@ -436,7 +420,7 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                                                     <input type='text' class='form-control' name='remarks' value='$remarks'>
                                                 </div>
 
-                                                <button type='submit' name='updateMe' class='btn btn-primary'>Update</button> 
+                                                <button type='submit' name='updateMe' class='btn btn-primary'>Update</button>
                                                 <button type='button' class='btn btn-success'>Print</button>
                                             </form>
                                         </div>
@@ -456,14 +440,13 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                                         </div>
                                         <div class='modal-body'>
 
-                                            <form method='POST' action='admin.php'>
+                                            <form method='POST' action='adminComplete.php'>
                                             <input type='hidden' name='DcomplaintID' value='$complaintID'>
                                             <input type='hidden' name='Dstatus' value='$complaintStatus'>
 
                                                 <h1> Are you sure you want to archive this record? </h1>
 
                                                 <button type='submit' name='archiveMe' class='btn btn-danger'>Delete</button>
-                                                
                                             </form>
                                         </div>
                                     </div>
@@ -471,16 +454,15 @@ if (!isset($_SESSION['sessionBrgyOperatorID'])){
                             </div>";
                     }
                 } else {
-                    echo "<tr><td colspan='14'>No Records Found</td></tr>";
+                    echo "<tr><td colspan='14'>No Records.</td></tr>";
                 }
                 $conn->close();
                 ?>
             </tbody>
         </table>
     </div>
-
-
-    
-    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 </body>
 </html>

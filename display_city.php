@@ -1,8 +1,22 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['sessionAdminID'])){
+
+    header("Location: session_error_page_admin.php");
+}
+
+?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Cities</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
     <style>
 
         body {
@@ -47,6 +61,11 @@
         .tab.active {
             background-color: #004A8F;
         }
+
+        .tab.logout {
+            background-color: #FF0000;
+        }
+
 
         table {
             width: 100%;
@@ -137,6 +156,46 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+    if (isset($_POST['updateMe'])) {
+        $cityID = $_POST["cityID"];
+        $cityName = $_POST["cityName"];
+        $cityExpiry = $_POST["cityExpiry"];
+
+
+        $conn = new mysqli("localhost", "root", "", "ebarangaydatabase");
+        if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+        }
+
+        $sql = "UPDATE city 
+                SET cityName = '$cityName', cityExpiry = '$cityExpiry'
+                WHERE cityID = $cityID";
+        if ($conn->query($sql) === TRUE) {
+        } else {
+            echo "Error updating city.";
+        }
+        $conn->close();
+        }
+
+        if(isset($_POST['archiveMe'])){
+
+            $DcityID = $_POST["DcityID"];
+
+            $conn = new mysqli("localhost", "root", "", "ebarangaydatabase");
+            if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+            }
+
+            $sql2 = "DELETE FROM city
+                     WHERE cityID = $DcityID";
+            if ($conn->query($sql2) === TRUE) {
+
+            } else {
+                echo "Error deleting City.";
+            }
+            $conn->close();
+        }
+
 
     ?>
 
@@ -145,14 +204,41 @@
         <div class="sidebar">
             <div class="profile">
                 <div class="profile-picture"></div>
-                <div class="profile-name">James Russell Saro</div>
+                <div class="profile-name">
+
+
+                <?php 
+                //GET SESSION DETAILS CONVERT TO NAME 
+                $testSession = $_SESSION['sessionAdminID'];
+                $conn = new mysqli('localhost', 'root', '', 'ebarangaydatabase');
+
+                if ($conn->connect_error) {
+                    die("Connection failed: " . $conn->connect_error);
+                }
+
+                $sql = "SELECT firstName, lastName FROM user WHERE userID = '$testSession' AND accountType = 'Administrator'";
+                $result = $conn->query($sql);
+
+                if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $SfirstName = $row['firstName'];
+                $SlastName = $row['lastName'];
+
+                echo "$SfirstName $SlastName";
+                } else {
+                }   
+                $conn->close();
+                ?>
+                </div>
                 <div class="profile-title">Administrator</div>
             </div>
             <div class="tabs">
-                <a href=""><div class="tab">Profile</div></a>
-                <a href="display_city.php"><div class="tab">Cities</div></a>
+                <a href="admin_profile.php"><div class="tab">Profile</div></a>
+                <a href="display_city.php"><div class="tab active">Cities</div></a>
                 <a href="display_barangay.php"><div class="tab">Barangays</div></a>
-                <a href="display_operator.php"><div class="tab">Operator Management</div></a>
+                <a href="display_operator.php"><div class="tab">Barangay Operator Management</div></a>
+                <a href="display_lgu_operator.php"><div class="tab">LGU Operator Management</div></a>
+                <a href="adminBlockerPage.html"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
             </div>
         </div>
         <div class="content">
@@ -168,6 +254,8 @@
         $sql = "SELECT * FROM city";
         $result = $conn->query($sql);
 
+        
+
         if ($result->num_rows > 0) {
             echo "<table class='table table-bordered'>";
             echo "<thead>
@@ -179,18 +267,84 @@
         </thead>";
 
             while ($row = $result->fetch_assoc()) {
+
+                $cityName = $row["cityName"];
+                $cityExpiry = $row["cityExpiry"];
+                $cityID = $row["cityID"];
+                $formattedDatetime = date('Y-m-d\TH:i', strtotime($cityExpiry));
+                
                 echo "<tr>";
-                echo "<td>" . $row["cityName"] . "</td>";
-                echo "<td>" . $row["cityExpiry"] . "</td>";
+                echo "<td>$cityName</td>";
+                echo "<td>$cityExpiry</td>";
                 echo "<td>
-                <button type='button' class='btn btn-primary'>
-                    Edit
-                </button>
-                <button type='button' class='btn btn-danger'>
-                    Delete
-                </button>
+                <button type='button' class='btn btn-primary' data-toggle='modal' data-target='#myModal$cityID'>
+                                        Edit
+                        </button>
+                        <button type='button' class='btn btn-danger' data-toggle='modal' data-target='#deleteModal$cityID'>
+                        Delete
+                    </button>
             </td>";
                 echo "</tr>";
+
+                 //POP UP MODAL
+                 echo "<div class='modal fade' id='myModal$cityID' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
+                 <div class='modal-dialog' role='document'>
+                     <div class='modal-content'>
+                         <div class='modal-header'>
+                             <h5 class='modal-title' id='myModalLabel'>Complaint Details</h5>
+                             <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                                 <span aria-hidden='true'>&times;</span>
+                             </button>
+                         </div>
+                         <div class='modal-body'>
+
+
+                         <form method='POST' action='display_city.php'>
+                         <input type='hidden' name='cityID' value='$cityID'>
+
+         <div class='form-group'>
+         <label for='cityName'>City Name</label>
+         <input type='text' class='form-control' value='$cityName' name='cityName'>
+         </div>
+
+         <div class='form-group'>
+         <label for='cityName'>City Expiry</label>
+         <input type='datetime-local' class='form-control' value='$formattedDatetime' name='cityExpiry' required>
+         
+         </div>
+         <button type='submit' class='btn btn-primary' name='updateMe'>Update</button>
+         
+         </form>
+
+
+                         </div>
+                     </div>
+                 </div>
+             </div>";
+
+             //DELETE MODAL
+             echo "<div class='modal fade' id='deleteModal$cityID' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
+             <div class='modal-dialog' role='document'>
+                 <div class='modal-content'>
+                     <div class='modal-header'>
+                         <h5 class='modal-title' id='myModalLabel'>Delete Confirmation</h5>
+                         <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                             <span aria-hidden='true'>&times;</span>
+                         </button>
+                     </div>
+                     <div class='modal-body'>
+
+                         <form method='POST' action='display_city.php'>
+                         <input type='hidden' name='DcityID' value='$cityID'>
+
+                             <h1> Are you sure you want to Delete this city? </h1>
+
+                             <button type='submit' name='archiveMe' class='btn btn-danger'>Delete</button>
+                         </form>
+                     </div>
+                 </div>
+             </div>
+         </div>";
             }
 
             echo "</table>";
@@ -203,10 +357,8 @@
         <a class="btn btn-success" href="create_city.php" role="button">Add City</a>
     </div>
 
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
         </div>
     </div>
-
-</body>
 </body>
 </html>

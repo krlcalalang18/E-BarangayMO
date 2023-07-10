@@ -185,8 +185,8 @@ if (!isset($_SESSION['sessionAdminID'])){
                 <a href="admin_profile.php"><div class="tab">Profile</div></a>
                 <a href="display_city.php"><div class="tab">Cities</div></a>
                 <a href="display_barangay.php"><div class="tab">Barangays</div></a>
-                <a href="display_operator.php"><div class="tab active">Barangay Operator Management</div></a>
-                <a href="display_lgu_operator.php"><div class="tab">LGU Operator Management</div></a>
+                <a href="display_operator.php"><div class="tab">Barangay Operator Management</div></a>
+                <a href="display_lgu_operator.php"><div class="tab active">LGU Operator Management</div></a>
                 <a href="adminBlockerPage.html"><div class="tab logout">Log Out</div></a> <!--add logout codes here -->
             </div>
         </div>
@@ -205,7 +205,6 @@ if (!isset($_SESSION['sessionAdminID'])){
                     <th>City</th>
                     <th>Barangay</th>
                     <th>Account Type</th>
-                    <th>Barangay Station</th>
                     <th>Account Status</th>
                     <th>Action</th>
                 </tr>
@@ -221,7 +220,6 @@ if ($conn->connect_error) {
 
 if (isset($_POST['updateMe'])) {
     $userID = $_POST["userID"];
-    $barangayID = $_POST["DbarangayID"];
     $accountStatus = $_POST["accountStatus"];
 
     $conn = new mysqli("localhost", "root", "", "ebarangaydatabase");
@@ -230,10 +228,8 @@ if (isset($_POST['updateMe'])) {
     }
 
     $sql = "UPDATE user u
-    INNER JOIN barangay_operator bo ON u.userID = bo.userID 
-    SET
-    u.accountStatus = '$accountStatus',
-    bo.barangayID = '$barangayID'
+    INNER JOIN lgu_operator lo ON u.userID = lo.userID 
+    SET u.accountStatus = '$accountStatus'
     WHERE u.userID = '$userID'";
     if ($conn->query($sql) === TRUE) {
     } else {
@@ -252,7 +248,7 @@ if (isset($_POST['updateMe'])) {
         die("Connection failed: " . $conn->connect_error);
         }
 
-        $sql2 = "DELETE FROM user
+        $sql2 = "DELETE FROM lgu_operator
                  WHERE userID = $DuserID";
         if ($conn->query($sql2) === TRUE) {
 
@@ -268,9 +264,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT barangayName, barangayID
-        FROM barangay_station
-        ORDER BY barangayName ASC";
+$sql = "SELECT barangayName, barangayID FROM barangay_station";
 $result = mysqli_query($conn, $sql);
 
 $options = '';
@@ -281,10 +275,9 @@ while ($row = mysqli_fetch_assoc($result)) {
     $options .= "<option value='$DbarangayID'>$DbarangayName</option>";
 }
 
-$sql1 = "SELECT user.userID, user.firstName, user.lastName, user.middleName, user.emailAddress, user.cellphoneNumber, user.streetAddress, user.city, user.barangay, user.accountType, barangay_station.barangayName AS barangayStation, user.accountStatus
-         FROM user
-         INNER JOIN barangay_operator ON user.userID = barangay_operator.userID
-         INNER JOIN barangay_station ON barangay_operator.barangayID = barangay_station.barangayID";
+$sql1 = "SELECT user.userID, user.firstName, user.lastName, user.middleName, user.emailAddress, user.cellphoneNumber, user.streetAddress, user.city, user.barangay, user.accountType, user.accountStatus
+FROM user
+INNER JOIN lgu_operator ON user.userID = lgu_operator.userID";
 
 $result1 = $conn->query($sql1);
 
@@ -304,7 +297,6 @@ $result1 = $conn->query($sql1);
                         $city = $row['city'];
                         $barangay = $row['barangay'];
                         $accountType = $row['accountType'];
-                        $barangayStation = $row['barangayStation'];
                         $accountStatus = $row['accountStatus'];
 
                         echo "<tr>";
@@ -317,7 +309,6 @@ $result1 = $conn->query($sql1);
                         echo "<td>".$row['city']."</td>";
                         echo "<td>".$row['barangay']."</td>";
                         echo "<td>".$row['accountType']."</td>";
-                        echo "<td>".$row['barangayStation']."</td>";
                         echo "<td>".$row['accountStatus']."</td>";
                         echo "<td>
                         <button type='button' class='btn btn-primary' data-toggle='modal' data-target='#myModal$userID'>
@@ -334,7 +325,7 @@ $result1 = $conn->query($sql1);
                  <div class='modal-dialog' role='document'>
                      <div class='modal-content'>
                          <div class='modal-header'>
-                             <h5 class='modal-title' id='myModalLabel'>Edit Operator</h5>
+                             <h5 class='modal-title' id='myModalLabel'>Complaint Details</h5>
                              <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
                                  <span aria-hidden='true'>&times;</span>
                              </button>
@@ -342,7 +333,7 @@ $result1 = $conn->query($sql1);
                          <div class='modal-body'>
 
 
-                         <form method='POST' action='display_operator.php'>
+                         <form method='POST' action='display_lgu_operator.php'>
                          <input type='hidden' name='userID' value='$userID'>
 
          <div class='form-group'>
@@ -391,14 +382,6 @@ $result1 = $conn->query($sql1);
          </div>
 
          <div class='form-group'>
-         <label for='status'>Barangay Station</label>
-         <select class='form-control' name='DbarangayID'>
-         <option value='$barangayStation' selected disabled> $barangayStation </option>
-         $options
-         </select>
-         </div>
-
-         <div class='form-group'>
          <label for='status'>Account Status</label>
          <select class='form-control' name='accountStatus'>
          <option value='Active' " . ($accountStatus == 'Active' ? 'selected' : '') . ">Active</option>
@@ -417,9 +400,8 @@ $result1 = $conn->query($sql1);
                      </div>
                  </div>
              </div>";
-                    }
 
-                    //DELETE MODAL
+             //DELETE MODAL
              echo "<div class='modal fade' id='deleteModal$userID' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
              <div class='modal-dialog' role='document'>
                  <div class='modal-content'>
@@ -431,7 +413,7 @@ $result1 = $conn->query($sql1);
                      </div>
                      <div class='modal-body'>
 
-                         <form method='POST' action='display_operator.php'>
+                         <form method='POST' action='display_lgu_operator.php'>
                          <input type='hidden' name='DuserID' value='$userID'>
 
                              <h1> Are you sure you want to Delete this operator? </h1>
@@ -442,6 +424,7 @@ $result1 = $conn->query($sql1);
                  </div>
              </div>
          </div>";
+                    }
                 }
                 ?>
             </tbody>
