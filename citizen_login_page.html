@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Citizen Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="citizenlogin.css">
+    <style>
+        .container {
+            margin-top: 100px;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="container mt-3">
+            <img src="Logo.png" 
+            class="mx-auto d-block" 
+                style="width: 50%;"alt="logo">
+        </div> </br></br></br>
+        <h1>Citizen Login Page</h1>
+        <br>
+        <form method="POST" action="citizen_login.php">
+            <div class="form-group">
+                <label for="cellphoneNumber">Cellphone Number</label> 
+                <input type="text" class="form-control" id="cellphoneNumber" name="cellphoneNumber" required>
+
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+
+            </div>
+
+            <div class="button">
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+            </div>
+        </form> 
+        <br>
+        <div class="reg-link">
+            <a href="citizen_registration.php"> Register Here </a>    
+        </div>
+        <div class="reg-link-b">
+            <a href="change_password_page.php"> Forgot Password? </a>
+        </div>
+    </div>
+
+</body>
+
+
+</html>
