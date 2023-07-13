@@ -3,9 +3,21 @@
 <head>
     <title>Admin Registration</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="create_admin.css">
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+        .error {
+            color: red;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
+    <div class="text-center">
+            <img src="Logo.png" class="img-fluid col-sm-3" alt="logo">
+        </div>
         <h1>Admin Registration</h1>
         <form method="POST" action="insert_admin.php">
             <div class="form-group">
@@ -54,6 +66,7 @@
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
+            <a class="btn btn-danger" href="admin_login_page.php" role="button">Back</a>
         </form>
     </div>
 </body>
